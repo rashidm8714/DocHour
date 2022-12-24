@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from doctor.models import Doctor, Schedule
+from doctor.models import Doctor, Schedule, Specialization
 from datetime import date as dt, datetime
 import time
 from django.contrib.auth.models import User
@@ -16,7 +16,8 @@ def login_doc(request):
     return render(request,'doctor/doc-login.html', context={})
 
 def signup_doc(request):
-    return render(request,'doctor/doc-signup.html', context={})
+    spec = Specialization.objects.all()
+    return render(request,'doctor/doc-signup.html', context={'spec':spec})
 
 def doc_home(request):
     doc = Doctor.objects.get(user=request.user)
@@ -42,6 +43,7 @@ def register(request):
         place = request.POST.get('place')
         hospital = request.POST.get('hospital')
         specialization = request.POST.get('specialization')
+        specialization = Specialization.objects.get(id=specialization)
         if not User.objects.filter(username=username).exists():
             user = User(username=username, first_name=firstname, last_name=lastname, is_staff=1)
             user.set_password(password)

@@ -59,7 +59,13 @@
                         <input type="text" name="lastname" class="form-control" placeholder="Lastname" required><br>
                         <input type="text" name="hospital" class="form-control" placeholder="Hospital" required><br>
                         <input type="text" name="place" class="form-control" placeholder="Place" required><br>
-                        <input type="text" name="specialization" class="form-control" placeholder="Specialization" required><br>
+                        <select class="form-select" aria-label="Default select example" name="specialization">
+                          <option selected>select a specialization</option>
+                         {% for s in spec %}
+                          <option value="{{s.id}}">{{s.spec}}</option>
+                          {% endfor %}
+                        </select>
+                        <br>
                         <div class="d-grid gap-2">
                         <input type="submit" value="Register" class="btn btn-primary">
                         </div>   
