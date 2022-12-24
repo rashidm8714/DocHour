@@ -38,6 +38,11 @@
 
      `pip install -r requirements.txt`
      
+12.updating database
+
+     `python manage.py makemigrations`
+     `python manage.py migrate`
+     
 ## Running the project
 
 `python manage.py runserver`
