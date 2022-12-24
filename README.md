@@ -18,11 +18,11 @@
 
       `git -v`
 
-6. Initial setup git
+(Not needed)--6. Initial setup git-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
       `git config –global user.name “YourUserNameOnGithub” `
 
-      `git config –global user.email “YourEmail” `
+      `git config –global user.email “YourEmail” `xxxxxxxxxxxxxx
 
 7. cloning the project (downloading project to local machine)
 
