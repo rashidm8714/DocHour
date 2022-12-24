@@ -22,7 +22,9 @@ class Schedule(models.Model):
     doc = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date = models.DateField()
     start_time = models.TimeField()
-    taken = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
+    taken = models.ForeignKey(Client, related_name='taken', on_delete=models.CASCADE, null=True, blank=True)
+    confirmed = models.BooleanField(default=False)
+    cancelled = models.ForeignKey(Client, related_name='cancelled', on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return str(self.doc) +" "+ str(self.date)
 

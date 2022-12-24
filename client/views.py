@@ -19,8 +19,9 @@ def signup_client(request):
 def client_home(request):
     client = Client.objects.get(user=request.user)
     booked = Schedule.objects.filter(taken=client)
+    cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'spec':spec})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec})
 
 def client_home_spec(request):
     specs=""
@@ -28,10 +29,11 @@ def client_home_spec(request):
         specs = request.POST.get('spec')
     client = Client.objects.get(user=request.user)
     booked = Schedule.objects.filter(taken=client)
+    cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     spec_sel = Specialization.objects.get(id=specs)
     doc = Doctor.objects.filter(specialization=spec_sel)
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'spec_sel':spec_sel,'spec':spec, 'doc':doc})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doc':doc})
 
 def client_home_doc(request):
     specs=""
@@ -41,12 +43,13 @@ def client_home_doc(request):
         docs = request.POST.get('doc')
     client = Client.objects.get(user=request.user)
     booked = Schedule.objects.filter(taken=client)
+    cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     spec_sel = Specialization.objects.get(spec=specs)
     doc = Doctor.objects.filter(specialization=spec_sel)
     doctor = Doctor.objects.get(id=docs)
     doc_schedule = Schedule.objects.filter(doc=doctor)
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'spec_sel':spec_sel,'spec':spec, 'doc':doc, 'doc_schedule':doc_schedule, 'doctor':doctor})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doc':doc, 'doc_schedule':doc_schedule, 'doctor':doctor})
 
 
 def register(request):
@@ -92,6 +95,19 @@ def user_login(request):
     else:
         return HttpResponseRedirect(reverse('client:login_client'))
 
+def book_slot(request, slot):
+    user= User.objects.get(id = request.user.id)
+    slot= Schedule.objects.get(id = slot)
+    client = Client.objects.get(user=user)
+    slot.taken = client
+    slot.confirmed = False
+    slot.save()
+    return HttpResponseRedirect(reverse('client:client_home'))
+
+def delete_slot(request, slot):
+    slot = Schedule.objects.get(id=slot)
+    slot.delete()
+    return HttpResponseRedirect(reverse('client:client_home'))
 
 @login_required
 def user_logout(request):

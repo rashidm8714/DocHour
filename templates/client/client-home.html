@@ -49,12 +49,18 @@
             
             <div class="card m-2 px-2 bg-light">
                 <div class="card-body">
-                  <h5 class="card-title">Booked Schedule</h5>
+                  <h5 class="card-title">Booked Slots</h5>
 
-                  <ul class="list-group text-start"  style="overflow-y: scroll; height:200px">
+                  <ul class="list-group text-start"  style="overflow-y: scroll; height:250px">
                     {% for slot in booked %}
-                    <li class="list-group-item text-center">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b>
-                    </li>
+                    {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-success">confirmed</span></li>
+                    {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% for slot in cancelled %}
+                    <li class="list-group-item text-center"  style="background-color: rgb(233, 196, 182);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
+                      <span class="badge rounded-pill bg-danger">cancelled by doctor</span> <a href="{% url 'client:delete_slot' slot.id %}"><span class="badge rounded-pill bg-danger"><i class="bi bi-trash-fill"></i></span></a></li>
                     {% endfor %}
                     <br>
 
@@ -90,7 +96,27 @@
         <ul class="list-group text-start"  style="overflow-y: scroll; height:400px">
           {% for slot in doc_schedule  %}
           {% if  slot.taken %}<li class="list-group-item text-center" style="background-color: rgb(235, 194, 194);">{{slot.date}} - {{slot.start_time}} <span class="badge bg-danger rounded-pill">Taken</span>
-          {% else %}<li class="list-group-item text-center" style="background-color: rgb(210, 240, 192);">{{slot.date}} - {{slot.start_time}} <span class="badge bg-success rounded-pill">BOOK NOW</span>
+          {% else %}<li class="list-group-item text-center" style="background-color: rgb(210, 240, 192);">{{slot.date}} - {{slot.start_time}} <a href="" data-bs-toggle="modal" data-bs-target="#Schedule{{ forloop.counter }}"><span class="badge bg-success rounded-pill">BOOK NOW</span></a>
+            <!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="Schedule{{ forloop.counter }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm slot</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Confirm booking of your slot with <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> on <b>{{slot.date}}</b> at <b>{{slot.start_time}}</b> ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="{% url 'client:book_slot' slot.id %}">Confirm</a>
+      </div>
+    </div>
+  </div>
+</div>
           {% endif %}
           </li>
           {% endfor %}
@@ -99,6 +125,51 @@
         </ul>
         </div>
         <div class="col-sm-5 mx-auto p-3 border bg-white">
+
+          <form action="" method="post">
+
+            <div class="card mb-2">
+                <div class="row  p-3">
+                <div class="col-sm-2 text-center my-auto">
+                    <i class="bi bi-person-circle fs-2"></i>
+                </div>
+                <div class="col-sm-9">
+                    <b>Doc Name</b> <br>
+                    10:00 AM - 11.00 AM
+
+                </div>
+                </div>
+
+            </div>
+            
+        <div class="row p-5" style="overflow-y: scroll; height:400px">
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
+            <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
+            <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
+        </div>
+
+        <div class="row mt-4 mx-auto">
+            <div class="col-10">
+                <input class="form-control rounded-pill" type="text" placeholder="Enter message to send" aria-label="Enter message to send">
+            </div>
+            <div class="col-2">
+                <button type="submit" class="rounded-circle btn btn-dark mr-0"><i class="bi bi-send-fill"></i></button>
+            </div>
+
+        </div>
+            
+        </form>
+
+
         </div>
       </div>
       </div>

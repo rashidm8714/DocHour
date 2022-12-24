@@ -50,7 +50,7 @@
                 <div class="card-body">
                   <h5 class="card-title">Schedule</h5>
                   <div class="dropdown">
-                    <button class="dropdown-toggle btn btn-sm btn-dark" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="dropdown-toggle btn btn-sm btn-dark form-control" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                       {% if date %} {{date}} {% else%} choose date to see schedules{% endif %}
                     </button>
                     <ul class="dropdown-menu text-center">
@@ -61,12 +61,86 @@
                       {% endfor %}
                     </ul>
                   </div>
-                    <br>
+      
                   <ul class="list-group text-start">
                     {% for slot in slots %}
-                    <li class="list-group-item text-center"><b>{{slot.start_time}} &nbsp;<span class="badge rounded-pill text-bg-info">{% if slot.taken %}taken{% else %}empty slot{% endif %}</span></b>
-                    </li>
+                    {% if slot.taken %}{% if slot.confirmed %}<a data-bs-toggle="modal" data-bs-target="#taken{{forloop.counter}}"><li class="list-group-item text-center" style="background-color: rgb(192, 247, 206);"><b>{{slot.start_time}} &nbsp;<span class="badge rounded-pill text-bg-success">Taken</span></b></li></a>
+                    {% else %}<a data-bs-toggle="modal" data-bs-target="#confirm{{forloop.counter}}"><li class="list-group-item text-center" style="background-color: rgb(223, 247, 192);"><b>{{slot.start_time}} &nbsp;<span class="badge rounded-pill text-bg-warning">Verify and confirm</span></b></li></a>
+                    {% endif %}{% else %}<li class="list-group-item text-center"  style="background-color: rgb(192, 218, 247);"><b>{{slot.start_time}} &nbsp;<span class="badge rounded-pill text-bg-info">Empty</span></b> 
+                      <a data-bs-toggle="modal" data-bs-target="#delete{{forloop.counter}}"><span class="badge bg-danger rounded-pill"><i class="bi bi-trash-fill"></i></span></a></li>
+                    {% endif %}
                     
+                    
+
+                    <!-- Modal - Delete slot-->
+                    <div class="modal fade" id="delete{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm slot</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            Date and time : {{slot.date}} - {{slot.start_time}} <br>
+                            Confirm delete ?
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a class="btn btn-primary" href="{% url 'doctor:delete_slot' slot.id %}">Confirm</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal - Details of slot-->
+                    <div class="modal fade" id="taken{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm slot</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            Date and time : {{slot.date}} - {{slot.start_time}} <br>
+                            Name: {{slot.taken.user.first_name}} {{slot.taken.user.last_name}} <br>
+                            Place: {{slot.taken.place}} <br>
+                            Age: {{slot.taken.age}} <br>
+                            Health history: {{slot.taken.health_history}}
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal - Confirm slot-->
+                    <div class="modal fade" id="confirm{{forloop.counter}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Confirm slot</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            Date and time : {{slot.date}} - {{slot.start_time}} <br>
+                            Name: {{slot.taken.user.first_name}} {{slot.taken.user.last_name}} <br>
+                            Place: {{slot.taken.place}} <br>
+                            Age: {{slot.taken.age}} <br>
+                            Health history: {{slot.taken.health_history}}
+                            <br><br>
+                           <b> Confirm booking?</b>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a class="btn btn-danger" href="{% url 'doctor:cancel_booking' slot.id %}">Cancel</a>
+                            <a class="btn btn-primary" href="{% url 'doctor:confirm_booking' slot.id %}">Confirm</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+
                     {% endfor %}
                     <br>
                     <script>
@@ -106,20 +180,20 @@
 
         <div class="col-sm-3 bg-light p-3 border">
           <p class="text-center bg-primary rounded-pill text-light border">Today's Schedules</p>
-          {% for td in today %}
+          {% for td in today %}{% if td.confirmed %}
             <div class="card mb-2">
                 <div class="row  p-3">
                 <div class="col-sm-2 text-center my-auto">
                     <i class="bi bi-person-circle fs-2"></i>
                 </div>
                 <div class="col-sm-9">
-                    <b>Client Name</b> <br>
-                    10:00 AM - 11.00 AM
+                    <b>{{td.taken.user.first_name}} {{td.taken.user.last_name}}</b><br>
+                    {{td.start_time}}
 
                 </div>
                 </div>
 
-            </div>
+            </div>{% endif %}
             {% endfor %}
 
         </div>

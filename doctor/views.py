@@ -5,7 +5,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from doctor.models import Doctor, Schedule
-from datetime import date as dt, datetime, timedelta
+from datetime import date as dt, datetime
+import time
 from django.contrib.auth.models import User
 # Create your views here.
 def welcome(request):
@@ -93,8 +94,27 @@ def add_slot(request):
             print(str(int(start[:2])+i) +":"+ start[3:])
             start =  str(datetime.strptime(str(int(start[:2])+i) +":"+ start[3:],"%H:%M"))[11:16]
             
-            sc = Schedule(doc=doc, date=date, start_time=start, taken=False)
+            sc = Schedule(doc=doc, date=date, start_time=start, taken=None)
             sc.save()
+    return HttpResponseRedirect(reverse('doctor:doc_home_slot', args=(date,)))
 
-    return HttpResponseRedirect(reverse('doctor:doc_home'))
+def confirm_booking(request, slot):
+    slot = Schedule.objects.get(id=slot)
+    slot.confirmed = True
+    slot.save()
+    return HttpResponseRedirect(reverse('doctor:doc_home_slot', args=(slot.date,)))
+
+def cancel_booking(request, slot):
+    slot = Schedule.objects.get(id=slot)
+    slot.confirmed=False
+    slot.cancelled = slot.taken
+    slot.taken=None
+    slot.save()
+    return HttpResponseRedirect(reverse('doctor:doc_home_slot', args=(slot.date,)))
+
+def delete_slot(request, slot):
+    slot = Schedule.objects.get(id=slot)
+    date = slot.date
+    slot.delete()
+    return HttpResponseRedirect(reverse('doctor:doc_home_slot', args=(date,)))
 
