@@ -16,7 +16,7 @@
 
 5. To check whether git is correctly installed
 
-      `git –version`
+      `git -v`
 
 6. Initial setup git
 
@@ -26,7 +26,7 @@
 
 7. cloning the project (downloading project to local machine)
 
-      `git clone https://github.com/musowir/DocHour/.git` 
+      `git clone https://github.com/musowir/DocHour.git` 
 
 8. go to project directory
 
@@ -49,3 +49,7 @@
 `python manage.py runserver`
 
 All done! server running!
+
+
+screenshot of the process : https://drive.google.com/file/d/1e3SQ67AeM0Fh2vic6eJb8TRXuyeprxqv/view?usp=share_link
+
