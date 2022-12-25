@@ -182,7 +182,7 @@
           <p class="text-center bg-primary rounded-pill text-light border">Today's Schedules</p>
           {% for td in today %}{% if td.confirmed %}
 
-          <script>
+          <!-- <script>
             function refresh() {
               $.ajax({
                 url:"{% url 'doctor:doc_home_chat' td.taken.id %}}", 
@@ -190,7 +190,7 @@
               });};
               var seconds =3;
               setInterval(refresh(), seconds*1000)
-          </script> 
+          </script>  -->
 
             <a href="{% url 'doctor:doc_home_chat' td.taken.id %}"><div class="card mb-2 text-dark">
                 <div class="row  p-3">
