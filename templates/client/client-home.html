@@ -55,7 +55,7 @@
           <select class="form-select" aria-label="Default select example"  onchange="this.form.submit()" name="doc">
             <option selected>{% if doctor %}{{doctor.user.first_name}} {{doctor.user.last_name}}{% else %} Select doctor {% endif %}</option>
             {% for d in doctors %}
-            <option value="{{d.id}}">{{d.user.first_name}} {{d.user.last_name}}</option>
+            <option value="{{d.id}}">Dr. {{d.user.first_name}} {{d.user.last_name}}</option>
             {% endfor %}
           </select>
           <input type="hidden" name="spec_sel" value="{{spec_sel}}">
@@ -76,7 +76,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        Confirm booking of your slot with <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> on <b>{{slot.date}}</b> at <b>{{slot.start_time}}</b> ?
+        Confirm booking of your slot with <b>Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> on <b>{{slot.date}}</b> at <b>{{slot.start_time}}</b> ?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -109,7 +109,7 @@
 
                 <ul class="list-group text-start"  style="overflow-y: scroll; height:300px">
                   {% for slot in booked %}
-                  {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
+                  {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
                     {% if slot in today%}
                     <script>
                       function refresh() {
@@ -123,12 +123,12 @@
                     
                     <a href="{% url 'client:client_home_chat' slot.doc.id %}"><span class="badge rounded-pill bg-success"> Start chat </span></a> {% else %}
                     <span class="badge rounded-pill bg-success"> Confirmed by doctor </span>{% endif %}</li>
-                  {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>
+                  {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b> Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>
                   {% endif %}
                   {% endfor %}
 
                   {% for slot in cancelled %}
-                  <li class="list-group-item text-center"  style="background-color: rgb(233, 196, 182);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
+                  <li class="list-group-item text-center"  style="background-color: rgb(233, 196, 182);">{{slot.date}} {{slot.start_time}} <br> <b> Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
                     <span class="badge rounded-pill bg-danger">cancelled by doctor</span> <a href="{% url 'client:delete_slot' slot.id %}"><span class="badge rounded-pill bg-danger"><i class="bi bi-trash-fill"></i></span></a></li>
                   {% endfor %}
                   <br>
@@ -149,7 +149,7 @@
                 <div class="col-sm-9 my-auto">
                   <div class="row">
                     <div class="col-8">
-                      <b>{{doctor.user.first_name}} {{doctor.user.last_name}}</b>
+                      <b>Dr. {{doctor.user.first_name}} {{doctor.user.last_name}}</b>
                     </div>
                     <div class="col-4 my-auto">
                       <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-camera-video-fill"></i></span>
