@@ -5,9 +5,11 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from client.models import Client
-from doctor.models import Schedule, Specialization, Doctor
+from doctor.models import Schedule, Specialization, Doctor, Message
 from datetime import date as dt, datetime, timedelta
 from django.contrib.auth.models import User
+from itertools import chain
+from operator import attrgetter
 # Create your views here.
 
 def login_client(request):
@@ -18,10 +20,24 @@ def signup_client(request):
 
 def client_home(request):
     client = Client.objects.get(user=request.user)
+    today = Schedule.objects.filter(taken=client, date = dt.today())
     booked = Schedule.objects.filter(taken=client)
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today})
+
+def client_home_chat(request, doc):
+    client = Client.objects.get(user=request.user)
+    today = Schedule.objects.filter(taken=client, date = dt.today())
+    booked = Schedule.objects.filter(taken=client)
+    cancelled = Schedule.objects.filter(cancelled=client)
+    spec = Specialization.objects.all()
+    doctor = Doctor.objects.get(id=doc)
+    msgs_recieved = Message.objects.filter(sender=request.user.id, reciever=doctor.user.id)
+    msgs_send = Message.objects.filter(reciever=request.user.id, sender=doctor.user.id)
+    msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today, 'doctor':doctor, 'msgs': msgs})
+
 
 def client_home_spec(request):
     specs=""
@@ -29,11 +45,12 @@ def client_home_spec(request):
         specs = request.POST.get('spec')
     client = Client.objects.get(user=request.user)
     booked = Schedule.objects.filter(taken=client)
+    today = Schedule.objects.filter(taken=client, date = dt.today())
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     spec_sel = Specialization.objects.get(id=specs)
     doc = Doctor.objects.filter(specialization=spec_sel)
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doc':doc})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc,  'today': today})
 
 def client_home_doc(request):
     specs=""
@@ -43,14 +60,32 @@ def client_home_doc(request):
         docs = request.POST.get('doc')
     client = Client.objects.get(user=request.user)
     booked = Schedule.objects.filter(taken=client)
+    today = Schedule.objects.filter(taken=client, date = dt.today())
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     spec_sel = Specialization.objects.get(spec=specs)
     doc = Doctor.objects.filter(specialization=spec_sel)
     doctor = Doctor.objects.get(id=docs)
     doc_schedule = Schedule.objects.filter(doc=doctor)
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doc':doc, 'doc_schedule':doc_schedule, 'doctor':doctor})
+    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc, 'doc_schedule':doc_schedule, 'doctor':doctor,  'today': today})
 
+def client_home_send(request):
+    if request.method == 'POST':
+        doc = request.POST.get('doc')
+        doc = Doctor.objects.get(id=doc)
+        message = request.POST.get('message')
+        msg = Message(sender = request.user, reciever= doc.user, message=message)
+        msg.save()
+        print(msg)
+        return HttpResponseRedirect(reverse('client:client_home_chat', args=(doc.id,)))
+
+def delete_msg(request):
+    if request.method == 'POST':
+        doc = request.POST.get('doc')
+        msg = request.POST.get('msg')
+        msg = Message(id=msg)
+        msg.delete()
+        return HttpResponseRedirect(reverse('client:client_home_chat', args=(doc,)))
 
 def register(request):
     if request.method == 'POST':

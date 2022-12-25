@@ -181,6 +181,17 @@
         <div class="col-sm-3 bg-light p-3 border">
           <p class="text-center bg-primary rounded-pill text-light border">Today's Schedules</p>
           {% for td in today %}{% if td.confirmed %}
+
+          <script>
+            function refresh() {
+              $.ajax({
+                url:"{% url 'doctor:doc_home_chat' td.taken.id %}}", 
+                success: function(data) {$ ('#msgboxdoc').replaceWith($('#msgboxdoc', data));}
+              });};
+              var seconds =3;
+              setInterval(refresh(), seconds*1000)
+          </script> 
+
             <a href="{% url 'doctor:doc_home_chat' td.taken.id %}"><div class="card mb-2 text-dark">
                 <div class="row  p-3">
                 <div class="col-sm-2 text-center my-auto">
@@ -223,7 +234,7 @@
     
                 </div>
                 
-            <div class="px-3" style="overflow-y: scroll; height:400px">
+            <div class="px-3" style="overflow-y: scroll; height:400px"  id="msgboxdoc">
               {% for m in msgs %}
               {% if m.sender.is_staff %}
               <div class="dropdown text-end">
@@ -250,16 +261,17 @@
             </div>
 
             <div class="row mt-4 mx-auto">
-              
+                
                 <div class="col-10">
-                  <form action="{% url 'doctor:doc_home_send' client.id %}" method="post">
+                  <form action="{% url 'doctor:doc_home_send' %}" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="client" value="{{client.id}}">
                     <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit()">
                 </div>
                 <div class="col-2"> 
                     <button type="submit" class="rounded-circle btn btn-dark mr-0"><i class="bi bi-send-fill"></i></button>
                 </div>
-              </form>
+              </form> 
             </div>
         </div>
       </div>

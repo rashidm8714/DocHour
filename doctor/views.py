@@ -39,9 +39,9 @@ def doc_home_chat(request, client):
     msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
     return render(request,'doctor/doc-home.html', context={'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
     
-def doc_home_send(request, client):
-    print(client)
+def doc_home_send(request):
     if request.method == 'POST':
+        client = request.POST.get('client')
         client = Client.objects.get(id=client)
         message = request.POST.get('message')
         msg = Message(sender = request.user, reciever= client.user, message=message)

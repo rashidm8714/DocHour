@@ -54,7 +54,7 @@
           {% csrf_token %}
           <select class="form-select" aria-label="Default select example"  onchange="this.form.submit()" name="doc">
             <option selected>{% if doctor %}{{doctor.user.first_name}} {{doctor.user.last_name}}{% else %} Select doctor {% endif %}</option>
-            {% for d in doc %}
+            {% for d in doctors %}
             <option value="{{d.id}}">{{d.user.first_name}} {{d.user.last_name}}</option>
             {% endfor %}
           </select>
@@ -109,7 +109,20 @@
 
                 <ul class="list-group text-start"  style="overflow-y: scroll; height:300px">
                   {% for slot in booked %}
-                  {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-success">confirmed</span></li>
+                  {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
+                    {% if slot in today%}
+                    <script>
+                      function refresh() {
+                        $.ajax({
+                          url:"{% url 'client:client_home_chat' slot.doc.id %}", 
+                          success: function(data) {$ ('#msgbox').replaceWith($('#msgbox', data));}
+                        });};
+                        var seconds =3;
+                        setInterval(refresh(), seconds*1000)
+                    </script> 
+                    
+                    <a href="{% url 'client:client_home_chat' slot.doc.id %}"><span class="badge rounded-pill bg-success"> Start chat </span></a> {% else %}
+                    <span class="badge rounded-pill bg-success"> Confirmed by doctor </span>{% endif %}</li>
                   {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b>{{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>
                   {% endif %}
                   {% endfor %}
@@ -128,18 +141,15 @@
 
         <div class="col-sm-5 mx-auto p-3 border bg-white">
 
-          <form action="" method="post">
-
             <div class="card mb-2">
                 <div class="row  p-3">
                 <div class="col-sm-2 text-center my-auto">
                     <i class="bi bi-person-circle fs-2"></i>
                 </div>
-                <div class="col-sm-9">
+                <div class="col-sm-9 my-auto">
                   <div class="row">
                     <div class="col-8">
-                      <b>Doc Name</b> <br>
-                      10:00 AM - 11.00 AM
+                      <b>{{doctor.user.first_name}} {{doctor.user.last_name}}</b>
                     </div>
                     <div class="col-4 my-auto">
                       <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-camera-video-fill"></i></span>
@@ -152,10 +162,11 @@
                 </div>
 
             </div>
+        
             
-        <div class="row p-5" style="overflow-y: scroll; height:400px">
+        <div class="px-3" style="overflow-y: scroll; height:400px" id="msgbox">
           {% for m in msgs %}
-          {% if m.sender.is_staff %}
+          {% if not m.sender.is_staff %}
           <div class="dropdown text-end">
             <small><small><small>{{m.datetime}}</small></small></small><br>
             <button class="dropdown-toggle bg-dark text-light badge rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -163,11 +174,11 @@
             </button>
             <ul class="dropdown-menu text-center text-dark">
               
-              <form action="{% url 'doctor:delete_msg'%}" method="post">
+              <form action="{% url 'client:delete_msgs' %}" method="post">
                 {% csrf_token %}
               <input type="hidden" name="msg" value="{{m.id}}">
-              <input type="hidden" name="client" value="{{client.id}}">
-              <button type="submit" class="btn"> Delete message</button>
+              <input type="hidden" name="doc" value="{{doctor.id}}">
+              <button type="submit" class="btn">Delete message</button>
             </form>
             </ul>
           </div>
@@ -181,18 +192,19 @@
 
         <div class="row mt-4 mx-auto">
           <div class="col-10">
-            <form action="{% url 'doctor:doc_home_send' client.id %}" method="post">
+            <form action="{% url 'client:client_home_send' %}" method="post">
               {% csrf_token %}
+              <input type="hidden" name="doc" value="{{doctor.id}}">
               <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit()">
           </div>
           <div class="col-2"> 
               <button type="submit" class="rounded-circle btn btn-dark mr-0"><i class="bi bi-send-fill"></i></button>
           </div>
-        </form>
+        </>
 
         </div>
             
-        </form>
+       
 
 
         </div>

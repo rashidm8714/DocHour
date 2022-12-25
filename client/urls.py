@@ -14,6 +14,9 @@ urlpatterns=[
     url(r'delete_slot/(?P<slot>\d+)$', views.delete_slot, name='delete_slot'),
     url(r'^client_home_spec/', views.client_home_spec, name='client_home_spec'),
     url(r'^client_home_doc/', views.client_home_doc, name='client_home_doc'),
+    url(r'^client_home_chat/(?P<doc>\d+)$', views.client_home_chat, name='client_home_chat'),
+    url(r'^client_home_send/', views.client_home_send, name='client_home_send'),
+    url(r'delete_msgs/', views.delete_msg, name='delete_msgs'),
     url(r'user_logout/', views.user_logout, name='user_logout')
    
 ]
