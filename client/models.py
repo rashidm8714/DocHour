@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 # Create your models here.
 class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -8,7 +9,7 @@ class Client(models.Model):
     health_history = models.CharField(max_length=250)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.user.first_name)
 
 class Uploads(models.Model):
     client = models.OneToOneField(Client, on_delete=models.CASCADE)

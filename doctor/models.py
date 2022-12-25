@@ -28,4 +28,14 @@ class Schedule(models.Model):
     def __str__(self):
         return str(self.doc) +" "+ str(self.date)
 
+class Message(models.Model):
+    datetime = models.DateTimeField(auto_now=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
+    reciever = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reciever')
+    message = models.CharField(max_length=250)
+
+
+    def __str__(self):
+        return str(self.datetime)
+
     

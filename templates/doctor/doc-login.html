@@ -54,7 +54,7 @@
                     
                     <form action="{% url 'doctor:user_login' %}" method="post">
                         {% csrf_token %}
-                        <input type="email" name="username" class="form-control" placeholder="email ID"><br>
+                        <input type="email" name="username" class="form-control" placeholder="email ID" autofocus><br>
                         <input type="password" name="password" class="form-control" placeholder="password"><br>
                         <div class="d-grid gap-2">
                         <input type="submit" value="Login" class="btn btn-primary">

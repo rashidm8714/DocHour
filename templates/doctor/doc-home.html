@@ -181,7 +181,7 @@
         <div class="col-sm-3 bg-light p-3 border">
           <p class="text-center bg-primary rounded-pill text-light border">Today's Schedules</p>
           {% for td in today %}{% if td.confirmed %}
-            <div class="card mb-2">
+            <a href="{% url 'doctor:doc_home_chat' td.taken.id %}"><div class="card mb-2 text-dark">
                 <div class="row  p-3">
                 <div class="col-sm-2 text-center my-auto">
                     <i class="bi bi-person-circle fs-2"></i>
@@ -193,62 +193,74 @@
                 </div>
                 </div>
 
-            </div>{% endif %}
+            </div></a>{% endif %}
             {% endfor %}
 
         </div>
         <div class="col-sm-5 mx-auto p-3 border bg-white">
-            <form action="" method="post">
+           
 
                 <div class="card mb-2">
                     <div class="row  p-3">
                     <div class="col-sm-2 text-center my-auto">
                         <i class="bi bi-person-circle fs-2"></i>
                     </div>
-                    <div class="col-sm-9">
+                    <div class="col-sm-9 my-auto">
+                      {% if client %}
                       <div class="row">
                         <div class="col-8">
-                          <b>Doc Name</b> <br>
-                          10:00 AM - 11.00 AM
+                          <b>{{client.user.first_name}} {{client.user.last_name}}</b> <br>
+                          
                         </div>
                         <div class="col-4 my-auto">
                           <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-camera-video-fill"></i></span>
                           <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-folder-fill"></i> </span>
                         </div>
                       </div>
-    
+                      {% else %}Select a client{% endif %}
                     </div>
                     </div>
     
                 </div>
                 
-            <div class="row p-5" style="overflow-y: scroll; height:400px">
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> hi </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> hi </span></p>
-                <p class="text-end"><span class="badge rounded-pill text-bg-dark px-4 py-2"> I'm fine. </span></p>
-                <p class="text-start"><span class="badge rounded-pill text-bg-secondary px-4 py-2"> That's good to know. </span></p>
+            <div class="px-3" style="overflow-y: scroll; height:400px">
+              {% for m in msgs %}
+              {% if m.sender.is_staff %}
+              <div class="dropdown text-end">
+                <small><small><small>{{m.datetime}}</small></small></small><br>
+                <button class="dropdown-toggle bg-dark text-light badge rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{m.message}}
+                </button>
+                <ul class="dropdown-menu text-center text-dark">
+                  
+                  <form action="{% url 'doctor:delete_msg'%}" method="post">
+                    {% csrf_token %}
+                  <input type="hidden" name="msg" value="{{m.id}}">
+                  <input type="hidden" name="client" value="{{client.id}}">
+                  <button type="submit" class="btn"> Delete message</button>
+                </form>
+                </ul>
+              </div>
+                {% else %}
+                <div class=""><small><small><small>{{m.datetime}}</small></small></small><br><span class="badge text-bg-secondary  rounded-pill px-3 py-2">{{m.message}}</span></div>
+                {% endif %}
+              {% empty %}
+              <p class="text-center"><span class="badge rounded-pill text-bg-secondary px-3 py-2">{% if client %} No messages yet! {% else %} Select a client to start chat. {% endif %}</span></p>
+              {% endfor %}
             </div>
 
             <div class="row mt-4 mx-auto">
+              
                 <div class="col-10">
-                    <input class="form-control rounded-pill" type="text" placeholder="Enter message to send" aria-label="Enter message to send">
+                  <form action="{% url 'doctor:doc_home_send' client.id %}" method="post">
+                    {% csrf_token %}
+                    <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit()">
                 </div>
-                <div class="col-2">
+                <div class="col-2"> 
                     <button type="submit" class="rounded-circle btn btn-dark mr-0"><i class="bi bi-send-fill"></i></button>
                 </div>
-
+              </form>
             </div>
-                
-            </form>
-
         </div>
       </div>
       </div>

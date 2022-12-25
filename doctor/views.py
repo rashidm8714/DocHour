@@ -4,9 +4,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from doctor.models import Doctor, Schedule, Specialization
+from doctor.models import Doctor, Schedule, Specialization, Message
+from client.models import Client
 from datetime import date as dt, datetime
-import time
+from itertools import chain
+from operator import attrgetter
 from django.contrib.auth.models import User
 # Create your views here.
 def welcome(request):
@@ -25,6 +27,37 @@ def doc_home(request):
     dates = sorted(set([sc.date for sc in schedule]))
     today = Schedule.objects.filter(doc=doc, date=dt.today())
     return render(request,'doctor/doc-home.html', context={'doc':doc, 'dates':dates, 'today':today})
+
+def doc_home_chat(request, client):
+    doc = Doctor.objects.get(user=request.user)
+    schedule = Schedule.objects.filter(doc=doc)
+    dates = sorted(set([sc.date for sc in schedule]))
+    today = Schedule.objects.filter(doc=doc, date=dt.today())
+    client = Client.objects.get(id=client)
+    msgs_send = Message.objects.filter(sender=request.user.id, reciever=client.user.id)
+    msgs_recieved = Message.objects.filter(reciever=request.user.id, sender=client.user.id)
+    msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
+    return render(request,'doctor/doc-home.html', context={'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
+    
+def doc_home_send(request, client):
+    print(client)
+    if request.method == 'POST':
+        client = Client.objects.get(id=client)
+        message = request.POST.get('message')
+        msg = Message(sender = request.user, reciever= client.user, message=message)
+        msg.save()
+        print(msg)
+        return HttpResponseRedirect(reverse('doctor:doc_home_chat', args=(client.id,)))
+
+def delete_msg(request):
+    if request.method == 'POST':
+        client = request.POST.get('client')
+        msg = request.POST.get('msg')
+        msg = Message(id=msg)
+        msg.delete()
+        return HttpResponseRedirect(reverse('doctor:doc_home_chat', args=(client,)))
+
+
 
 def doc_home_slot(request, date):
     doc = Doctor.objects.get(user=request.user)
