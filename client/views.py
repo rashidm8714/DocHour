@@ -95,7 +95,6 @@ def client_home_send(request):
         message = request.POST.get('message')
         msg = Message(sender = request.user, reciever= doc.user, message=message)
         msg.save()
-        print(msg)
         return HttpResponseRedirect(reverse('client:client_home_chat', args=(doc.id,)))
 
 def delete_msg(request):
