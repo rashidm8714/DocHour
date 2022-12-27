@@ -125,9 +125,9 @@ def add_slot(request):
         date = request.POST.get('date')
         start = request.POST.get('start')
         no_hours = int(request.POST.get('no_hours'))
-        for i in range(no_hours):
-            print(str(int(start[:2])+i) +":"+ start[3:])
-            start =  str(datetime.strptime(str(int(start[:2])+i) +":"+ start[3:],"%H:%M"))[11:16]
+
+        for _ in range(no_hours):
+            start =  str(datetime.strptime(str(int(start[:2])+1) +":"+ start[3:],"%H:%M"))[11:16]
             sc = Schedule(doc=doc, date=date, start_time=start, taken=None)
             sc.save()
     return HttpResponseRedirect(reverse('doctor:doc_home_slot', args=(date,)))
