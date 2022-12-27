@@ -63,7 +63,7 @@
           <input type="hidden" name="spec_sel" value="{{spec_sel}}">
         </form>
         <br>
-        <ul class="list-group text-start"  style="overflow-y: scroll; height:400px">
+        <ul class="list-group text-start"  style="overflow-y: auto; height:400px">
           {% for slot in doc_schedule  %}
           {% if  slot.taken %}<li class="list-group-item text-center" style="background-color: rgb(235, 194, 194);">{{slot.date}} - {{slot.start_time}} <span class="badge bg-danger rounded-pill">Taken</span>
           {% else %}<li class="list-group-item text-center" style="background-color: rgb(210, 240, 192);">{{slot.date}} - {{slot.start_time}} <a href="" data-bs-toggle="modal" data-bs-target="#Schedule{{ forloop.counter }}"><span class="badge bg-success rounded-pill">BOOK NOW</span></a>
@@ -108,22 +108,15 @@
           <div class="card m-2 px-2 bg-light">
               <div class="card-body">
                 <h5 class="card-title">Booked Slots</h5>
-
-                <ul class="list-group text-start"  style="overflow-y: scroll; height:300px">
+                <script>
+                  
+                </script>
+                <ul class="list-group text-start"  style="overflow-y: auto; height:300px">
                   {% for slot in booked %}
                   {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
-                    {% if slot in today%}
-                    <!-- <script>
-                      function refresh() {
-                        $.ajax({
-                          url:"{% url 'client:client_home_chat' slot.doc.id %}", 
-                          success: function(data) {$ ('#msgbox').replaceWith($('#msgbox', data));}
-                        });};
-                        var seconds =3;
-                        setInterval(refresh(), seconds*1000)
-                    </script>  -->
-                    
-                    <a href="{% url 'client:client_home_chat' slot.doc.id %}"><span class="badge rounded-pill bg-success"> Start chat </span></a> {% else %}
+                    {% if slot in today%}<span class="badge rounded-pill bg-success">  Today </span>
+                    {% if doctor != 0 %}<a href="{% url 'client:client_home_chat' slot.doc.id %}"><span class="badge rounded-pill bg-success">  Start chat </span></a>{% endif %}
+                    {% else %}
                     <span class="badge rounded-pill bg-success"> Confirmed by doctor </span>{% endif %}</li>
                   {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b> Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>
                   {% endif %}
@@ -151,7 +144,7 @@
                 <div class="col-sm-9 my-auto">
                   <div class="row">
                     <div class="col-8">
-                      <b>Dr. {{doctor.user.first_name}} {{doctor.user.last_name}}</b>
+                      <b>{% if doctor %}Dr. {{doctor.user.first_name}} {{doctor.user.last_name}}{% endif %}</b>
                     </div>
                     <div class="col-4 my-auto">
                       <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-camera-video-fill"></i></span>
@@ -165,9 +158,19 @@
 
             </div>
         
+        <script>
+          function scrollbottom() {
             
-        <div class="px-3" style="overflow-y: scroll; height:400px" id="msgbox">
+          var chatHistory = document.getElementById("msgbox");
+          chatHistory.scrollTo(0, nestedElement.scrollHeight);
+        }
+
+        </script>
+        <div class="px-3" style="overflow-y: auto; height:400px" id="msgbox">
           {% for m in msgs %}
+          {% if doctor == 0 %}
+          <p class="text-center"><span class="badge bg-secondary p-2 rounded-pill mt-4">{{msgs.0}}</span></p>
+          {% else %}
           {% if not m.sender.is_staff %}
           <div class="dropdown text-end">
             <small><small><small>{{m.datetime}}</small></small></small><br>
@@ -187,22 +190,28 @@
             {% else %}
             <div class=""><small><small><small>{{m.datetime}}</small></small></small><br><span class="badge text-bg-secondary  rounded-pill px-3 py-2">{{m.message}}</span></div>
             {% endif %}
+            {% endif %}
           {% empty %}
           <p class="text-center"><span class="badge rounded-pill text-bg-secondary px-3 py-2">{% if client %} No messages yet! {% else %} Select a client to start chat. {% endif %}</span></p>
+          
           {% endfor %}
         </div>
 
         <div class="row mt-4 mx-auto">
+          {% if doctor != 0 %}
           <div class="col-10">
+            
             <form action="{% url 'client:client_home_send' %}" method="post">
               {% csrf_token %}
               <input type="hidden" name="doc" value="{{doctor.id}}">
-              <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit()">
+              <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit(); " autofocus>
           </div>
           <div class="col-2"> 
               <button type="submit" class="rounded-circle btn btn-dark mr-0"><i class="bi bi-send-fill"></i></button>
           </div>
-        </>
+        </form>
+        {% else %}
+        {% endif %}
 
         </div>
             

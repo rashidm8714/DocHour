@@ -1,0 +1,31 @@
+{% extends "doctor/client-home.html" %}
+
+{% block msginbox %}
+
+<div class="px-3" style="overflow-y: scroll; height:400px" id="msgbox">
+    {% for m in msgs %}
+    {% if not m.sender.is_staff %}
+    <div class="dropdown text-end">
+      <small><small><small>{{m.datetime}}</small></small></small><br>
+      <button class="dropdown-toggle bg-dark text-light badge rounded-pill" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        {{m.message}}
+      </button>
+      <ul class="dropdown-menu text-center text-dark">
+        
+        <form action="{% url 'client:delete_msgs' %}" method="post">
+          {% csrf_token %}
+        <input type="hidden" name="msg" value="{{m.id}}">
+        <input type="hidden" name="doc" value="{{doctor.id}}">
+        <button type="submit" class="btn">Delete message</button>
+      </form>
+      </ul>
+    </div>
+      {% else %}
+      <div class=""><small><small><small>{{m.datetime}}</small></small></small><br><span class="badge text-bg-secondary  rounded-pill px-3 py-2">{{m.message}}</span></div>
+      {% endif %}
+    {% empty %}
+    <p class="text-center"><span class="badge rounded-pill text-bg-secondary px-3 py-2">{% if client %} No messages yet! {% else %} Select a client to start chat. {% endif %}</span></p>
+    {% endfor %}
+  </div>
+
+{% endblock %}
