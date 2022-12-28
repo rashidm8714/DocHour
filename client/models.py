@@ -12,8 +12,10 @@ class Client(models.Model):
         return str(self.user.first_name)
 
 class Uploads(models.Model):
-    client = models.OneToOneField(Client, on_delete=models.CASCADE)
-    upload = models.FileField(upload_to='uploads/')
-
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    link = models.FileField(upload_to='uploads/')
+    filename = models.CharField(max_length=150)
+    caption = models.CharField(max_length=150)
+    date_of_issue = models.DateField()
     def __str__(self) -> str:
         return str(self.client)

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from doctor.models import Doctor, Schedule, Specialization, Message
-from client.models import Client
+from client.models import Client, Uploads
 from datetime import date as dt, datetime
 from itertools import chain
 from operator import attrgetter
@@ -34,10 +34,11 @@ def doc_home_chat(request, client):
     dates = sorted(set([sc.date for sc in schedule]))
     today = Schedule.objects.filter(doc=doc, date=dt.today())
     client = Client.objects.get(id=client)
+    upload = Uploads.objects.filter(client=client)
     msgs_send = Message.objects.filter(sender=request.user.id, reciever=client.user.id)
     msgs_recieved = Message.objects.filter(reciever=request.user.id, sender=client.user.id)
     msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
-    return render(request,'doctor/doc-home.html', context={'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
+    return render(request,'doctor/doc-home.html', context={'upload':upload, 'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
     
 def doc_home_send(request):
     if request.method == 'POST':

@@ -1,16 +1,19 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from client.models import Client
+from client.models import Client, Uploads
 from doctor.models import Schedule, Specialization, Doctor, Message
 from datetime import date as dt, datetime, timedelta
 from django.contrib.auth.models import User
 from itertools import chain
 from operator import attrgetter
+from django.core.files.storage import FileSystemStorage
 import time
+import mimetypes
+import os
 # Create your views here.
 
 def login_client(request):
@@ -25,7 +28,8 @@ def client_home(request):
     booked = Schedule.objects.filter(taken=client)
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today})
+    uploads = Uploads.objects.filter(client=client)
+    return render(request,'client/client-home.html', context={'uploads':uploads, 'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today})
 
 def client_home_chat(request, slot):
     doctor = 0
@@ -52,9 +56,9 @@ def client_home_chat(request, slot):
         msgs =["Schedule is from " + str(start)[11:16] + " to " + str(end)[11:16] ]
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
+    uploads = Uploads.objects.filter(client=client)
     
-    
-    return render(request,'client/client-home.html', context={'slot':slot, 'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today, 'doctor':doctor, 'msgs': msgs})
+    return render(request,'client/client-home.html', context={'uploads':uploads, 'slot':slot, 'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today, 'doctor':doctor, 'msgs': msgs})
 
 
 def client_home_spec(request):
@@ -68,7 +72,8 @@ def client_home_spec(request):
     spec = Specialization.objects.all()
     spec_sel = Specialization.objects.get(id=specs)
     doc = Doctor.objects.filter(specialization=spec_sel)
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc,  'today': today})
+    uploads = Uploads.objects.filter(client=client)
+    return render(request,'client/client-home.html', context={'uploads':uploads, 'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc,  'today': today})
 
 def client_home_doc(request):
     specs=""
@@ -89,8 +94,8 @@ def client_home_doc(request):
         if sc.date < dt.today() :
             sc.delete()
     doc_schedule = Schedule.objects.filter(doc=doctor)
-
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc, 'doc_schedule':doc_schedule, 'doctor':doctor,  'today': today})
+    uploads = Uploads.objects.filter(client=client)
+    return render(request,'client/client-home.html', context={'uploads':uploads, 'client': client, 'booked':booked, 'cancelled':cancelled, 'spec_sel':spec_sel,'spec':spec, 'doctors':doc, 'doc_schedule':doc_schedule, 'doctor':doctor,  'today': today})
 
 def client_home_send(request):
     if request.method == 'POST':
@@ -167,6 +172,40 @@ def delete_slot(request, slot):
     slot = Schedule.objects.get(id=slot)
     slot.delete()
     return HttpResponseRedirect(reverse('client:client_home'))
+
+def delete_file(request, upload):
+    upload = Uploads.objects.get(id=upload)
+    upload.delete()
+    return HttpResponseRedirect(reverse('client:client_home'))
+
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES['link']:
+        filen = request.POST.get("filename")
+        link = request.FILES['link']
+        link.name = ''.join([c if c!=' ' else '-' for c in link.name])
+        fs = FileSystemStorage()
+        filename = fs.save(link.name, link)
+        uploaded_file_url = fs.url(filename)
+        date_of_issue = request.POST.get('date_of_issue')
+        client = Client.objects.get(user=request.user)
+        upload = Uploads(filename=link.name, caption=filen, link=uploaded_file_url, date_of_issue=date_of_issue, client=client)
+        upload.save()
+        return HttpResponseRedirect(reverse('client:client_home'))
+
+def download_file(request, id):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    upload= Uploads.objects.get(id=id)
+    paths = upload.link.url
+    filepath = BASE_DIR + "".join([c if c != '/' else '\\' for c in paths[6:]])
+    with open(filepath, 'rb') as f:
+        path = f.read()
+    mime_type, _ = mimetypes.guess_type(filepath)
+    response = HttpResponse(path, content_type=mime_type)
+    # Set the HTTP header for sending to browser
+    response['Content-Disposition'] = "attachment; filename=%s" % upload.filename
+    # Return the response value
+    return response
 
 @login_required
 def user_logout(request):

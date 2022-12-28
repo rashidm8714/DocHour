@@ -18,7 +18,11 @@
           <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
             <a class="navbar-brand" href="#"><b class="bi bi-heart-pulse-fill text-light">
                 DocHour</b></a>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <a class="nav-link text-light rounded-pill border" data-bs-toggle="modal" data-bs-target="#file-upload"> <b class="bi bi-folder-fill"> File Upload</b>  </a>
+
+              
+            </ul>
             <div>
                     <a class="nav-link active text-light" aria-current="page" href="{% url 'doctor:user_logout' %}">Logout</a>
                  
@@ -27,7 +31,53 @@
         </div>
       </nav>
         
-      
+      <!-- Modal -file upload -->
+      <div class="modal fade" id="file-upload" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">File upload</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="{% url 'client:upload_file' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="text" name="filename" placeholder="filename" class="form-control" required >
+                <input type="date" name="date_of_issue" placeholder="Date of issue" class="form-control" required>
+                <div class="row">
+                  <div class="col-9">
+                    <input type="file" name="link" class="form-control" required>
+                  </div>
+                  <div class="col-3">
+                    <input type="submit" value="upload" class="form-control bg-info" required>
+                  </div>
+                </div>
+              </form>
+              <br>
+              <table class="table">
+                <tr>
+                  <th scope="col">Document</th>
+                  <th scope="col">Date of issue</th>
+                  <th></th>
+
+                </tr>
+
+                {% for f in uploads %}
+                <tr>
+                  <td scope="col"><a href="{% url 'client:download_file' f.id %}">{{f.caption}}</a></td>
+                  <td scope="col">{{f.date_of_issue}}</td>
+                  <td scope="col"><a href="{% url 'client:delete_file' f.id %}"><i class="bi bi-trash-fill text-danger"></i></a></td>
+
+                </tr>
+                {% endfor %}
+              </table>
+               </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <nav class="navbar bg-light">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
@@ -146,12 +196,11 @@
                 </div>
                 <div class="col-sm-9 my-auto">
                   <div class="row">
-                    <div class="col-8">
+                    <div class="col-10">
                       <b>{% if doctor %}Dr. {{doctor.user.first_name}} {{doctor.user.last_name}}{% endif %}</b>
                     </div>
-                    <div class="col-4 my-auto">
+                    <div class="col-2 my-auto">
                       <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-camera-video-fill"></i></span>
-                      <span class="badge text-bg-secondary rounded-circle fs-6"> <i class="bi bi-folder-fill"></i> </span>
                     </div>
                   </div>
                     
