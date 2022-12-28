@@ -115,7 +115,7 @@
                   {% for slot in booked %}
                   {% if slot.confirmed %}<li class="list-group-item text-center" style="background-color: rgb(187, 221, 154);">{{slot.date}} {{slot.start_time}} <br> <b>Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> 
                     {% if slot in today%}<span class="badge rounded-pill bg-success">  Today </span>
-                    {% if doctor != 0 %}<a href="{% url 'client:client_home_chat' slot.doc.id %}"><span class="badge rounded-pill bg-success">  Start chat </span></a>{% endif %}
+                    <a href="{% url 'client:client_home_chat' slot.id %}"><span class="badge rounded-pill bg-success">  Start chat </span></a>
                     {% else %}
                     <span class="badge rounded-pill bg-success"> Confirmed by doctor </span>{% endif %}</li>
                   {% else %}<li class="list-group-item text-center"  style="background-color: rgb(228, 233, 182);">{{slot.date}} {{slot.start_time}} <br> <b> Dr. {{slot.doc.user.first_name}} {{slot.doc.user.last_name}}</b> <br> <span class="badge rounded-pill bg-warning text-dark">waiting for confirmation</span></li>

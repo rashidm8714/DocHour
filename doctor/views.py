@@ -37,7 +37,7 @@ def doc_home_chat(request, client):
     msgs_send = Message.objects.filter(sender=request.user.id, reciever=client.user.id)
     msgs_recieved = Message.objects.filter(reciever=request.user.id, sender=client.user.id)
     msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
-    return render(request,'doctor/msgbox.html', context={'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
+    return render(request,'doctor/doc-home.html', context={'doc':doc, 'dates':dates, 'today':today, 'client' :client, 'msgs':msgs})
     
 def doc_home_send(request):
     if request.method == 'POST':
@@ -125,8 +125,10 @@ def add_slot(request):
         date = request.POST.get('date')
         start = request.POST.get('start')
         no_hours = int(request.POST.get('no_hours'))
-
-        for _ in range(no_hours):
+        start =  str(datetime.strptime(str(int(start[:2])) +":"+ start[3:],"%H:%M"))[11:16]
+        sc = Schedule(doc=doc, date=date, start_time=start, taken=None)
+        sc.save()
+        for _ in range(no_hours-1):
             start =  str(datetime.strptime(str(int(start[:2])+1) +":"+ start[3:],"%H:%M"))[11:16]
             sc = Schedule(doc=doc, date=date, start_time=start, taken=None)
             sc.save()

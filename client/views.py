@@ -27,25 +27,25 @@ def client_home(request):
     spec = Specialization.objects.all()
     return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today})
 
-def client_home_chat(request, doc):
+def client_home_chat(request, slot):
     doctor = 0
+    slot = Schedule.objects.get(id=slot)
     msgs = ['wait until your scheduled time to start chat']
     client = Client.objects.get(user=request.user)
     today = Schedule.objects.filter(taken=client, date = dt.today())
     booked = Schedule.objects.filter(taken=client)
-    
-    for sc in booked:
-        start = datetime.strptime(str(sc.date)+" "+str(int(str(sc.start_time)[:2])) +":"+ str(sc.start_time)[3:5],"%Y-%m-%d %H:%M")
-        if int(str(sc.start_time)[:2])!=23:
-            end = datetime.strptime(str(sc.date)+" "+str(int(str(sc.start_time)[:2])+1) +":"+ str(sc.start_time)[3:5],"%Y-%m-%d %H:%M")
-        else:
-            end = datetime.strptime(str(sc.date + timedelta(days=1))+" ""00:"+ str(sc.start_time)[3:5],"%Y-%m-%d %H:%M")
-        now = datetime.strptime(str(datetime.now())[0:16], "%Y-%m-%d %H:%M")
-        if sc.date == dt.today() and now >= start and now <= end :
-            doctor = Doctor.objects.get(id=doc)
-            msgs_recieved = Message.objects.filter(sender=request.user.id, reciever=doctor.user.id)
-            msgs_send = Message.objects.filter(reciever=request.user.id, sender=doctor.user.id)
-            msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
+
+    start = datetime.strptime(str(slot.date)+" "+str(int(str(slot.start_time)[:2])) +":"+ str(slot.start_time)[3:5],"%Y-%m-%d %H:%M")
+    if int(str(slot.start_time)[:2])!=23:
+        end = datetime.strptime(str(slot.date)+" "+str(int(str(slot.start_time)[:2])+1) +":"+ str(slot.start_time)[3:5],"%Y-%m-%d %H:%M")
+    else:
+        end = datetime.strptime(str(slot.date + timedelta(days=1))+" 00:"+ str(slot.start_time)[3:5],"%Y-%m-%d %H:%M")
+    now = datetime.strptime(str(datetime.now())[0:16], "%Y-%m-%d %H:%M")
+    if slot.date == dt.today() and now >= start and now <= end:
+        doctor = Doctor.objects.get(id=slot.doc.id)
+        msgs_recieved = Message.objects.filter(sender=request.user.id, reciever=doctor.user.id)
+        msgs_send = Message.objects.filter(reciever=request.user.id, sender=doctor.user.id)
+        msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     
