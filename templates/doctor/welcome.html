@@ -35,23 +35,30 @@
         </div>
       </nav>
       <div class="container">
-      <div class="row mx-auto my-auto">
-        <div class="col-sm-6 mx-auto my-auto">
-            <div class="card p-3 m-5">
+      <div class="row">
+        <div class="col-sm-6 mx-auto">
+            <div class="card p-3 m-5 mx-auto">
                 <div class="card-body">
                     <h5 class="card-title  text-center">
                         <a class="navbar-brand" href="#"><b class="bi bi-heart-pulse-fill text-danger">
                             DocHour</b></a>
-                    </h5><br>
+                    </h5><br> 
+                    <p><b>DocHour</b> offers you  a convenient way to stay in touch with your favorite doctors around the world. Your consultation now cross borders.</p>
+                    Get started by choosing type of user <br><br>
                 <div class="row text-center ">
-                    <div class="col-6"><a href="{% url 'client:login_client' %}" class="text-decoration-none"><div class="card p-4">
+                    <div class="col-4"><a href="{% url 'client:login_client' %}" class="text-decoration-none"><div class="card p-4">
                         <i class="bi bi-person-fill fs-1"></i>
                         <b>Client</b>
                     </div></a></div>
-                    <div class="col-6"><a href="{% url 'doctor:login_doc' %}" class="text-decoration-none"><div class="card p-4">
-                        <i class="bi bi-person-heart fs-1"></i>
-                        <b>Doctor</b>
-                    </div></a></div>
+                    <div class="col-4"><a href="{% url 'doctor:login_doc' %}" class="text-decoration-none"><div class="card p-4">
+                      <i class="bi bi-person-heart fs-1"></i>
+                      <b>Doctor</b>
+                  </div></a></div>
+                    <div class="col-4"><a href="admin/" class="text-decoration-none" target="_blank"><div class="card p-4">
+                      <i class="bi bi-person-fill-gear  fs-1"></i>
+                      <b>Client</b>
+                  </div></a></div>
+                    
                 </div>
                 </div>
                 </div>
