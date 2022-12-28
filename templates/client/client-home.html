@@ -97,7 +97,9 @@
 
         <div class="col-sm-4  border mx-auto px-4 py-2 text-center rounded bg-white" >
           <div class="card m-2 bg-light">
-            <br>
+            <div class="card-header bg-primary text-light">
+              Profile
+            </div>
           <p class="text-start p-3">
           Name: <b>{{client.user.first_name}} {{client.user.last_name}}</b><br>
           Age: <b> {{client.age}} </b><br>
@@ -182,7 +184,7 @@
               <form action="{% url 'client:delete_msgs' %}" method="post">
                 {% csrf_token %}
               <input type="hidden" name="msg" value="{{m.id}}">
-              <input type="hidden" name="doc" value="{{doctor.id}}">
+              <input type="hidden" name="slot" value="{{slot.id}}">
               <button type="submit" class="btn">Delete message</button>
             </form>
             </ul>
@@ -203,7 +205,8 @@
             
             <form action="{% url 'client:client_home_send' %}" method="post">
               {% csrf_token %}
-              <input type="hidden" name="doc" value="{{doctor.id}}">
+              <input type="hidden" name="doctor" value="{{doctor.id}}">
+              <input type="hidden" name="slot" value="{{slot.id}}">
               <input class="form-control rounded-pill" name="message" type="text" placeholder="Enter message to send" aria-label="Enter message to send" onformchange="this.form.submit(); " autofocus>
           </div>
           <div class="col-2"> 

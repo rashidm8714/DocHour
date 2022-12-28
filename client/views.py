@@ -50,7 +50,7 @@ def client_home_chat(request, slot):
     spec = Specialization.objects.all()
     
     
-    return render(request,'client/client-home.html', context={'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today, 'doctor':doctor, 'msgs': msgs})
+    return render(request,'client/client-home.html', context={'slot':slot, 'client': client, 'booked':booked,'cancelled':cancelled, 'spec':spec, 'today': today, 'doctor':doctor, 'msgs': msgs})
 
 
 def client_home_spec(request):
@@ -90,20 +90,22 @@ def client_home_doc(request):
 
 def client_home_send(request):
     if request.method == 'POST':
-        doc = request.POST.get('doc')
+        doc = request.POST.get('doctor')
         doc = Doctor.objects.get(id=doc)
+        slot = request.POST.get('slot')
+        slot = Schedule.objects.get(id=slot)
         message = request.POST.get('message')
         msg = Message(sender = request.user, reciever= doc.user, message=message)
         msg.save()
-        return HttpResponseRedirect(reverse('client:client_home_chat', args=(doc.id,)))
+        return HttpResponseRedirect(reverse('client:client_home_chat', args=(slot.id,)))
 
 def delete_msg(request):
     if request.method == 'POST':
-        doc = request.POST.get('doc')
+        slot = request.POST.get('slot')
         msg = request.POST.get('msg')
         msg = Message(id=msg)
         msg.delete()
-        return HttpResponseRedirect(reverse('client:client_home_chat', args=(doc,)))
+        return HttpResponseRedirect(reverse('client:client_home_chat', args=(slot,)))
 
 def register(request):
     if request.method == 'POST':
