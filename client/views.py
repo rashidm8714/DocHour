@@ -46,6 +46,10 @@ def client_home_chat(request, slot):
         msgs_recieved = Message.objects.filter(sender=request.user.id, reciever=doctor.user.id)
         msgs_send = Message.objects.filter(reciever=request.user.id, sender=doctor.user.id)
         msgs = sorted(chain(msgs_send, msgs_recieved), key=attrgetter('datetime'))
+    elif slot.date == dt.today() and now > end:
+        msgs =["Schedule ended at " + str(end)[11:16]]
+    elif slot.date == dt.today() and now < start:
+        msgs =["Schedule is from " + str(start)[11:16] + " to " + str(end)[11:16] ]
     cancelled = Schedule.objects.filter(cancelled=client)
     spec = Specialization.objects.all()
     

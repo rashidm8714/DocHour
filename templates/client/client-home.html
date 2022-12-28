@@ -40,7 +40,7 @@
       <div class="container">
       <div class="row">
       
-        <div class="col-sm-3 mx-auto p-3 border bg-light">
+        <div class="col-sm-3 mx-auto p-3 border bg-light rounded">
           <p class="bg-primary rounded-pill text-white text-center p-1"><b>Book a slot</b></p>
           <form action="{% url 'client:client_home_spec' %}" method="post">
             {% csrf_token %}
@@ -95,8 +95,8 @@
         </ul>
         </div>
 
-        <div class="col-sm-4  border mx-auto px-4 py-2 text-center rounded bg-white" >
-          <div class="card m-2 bg-light">
+        <div class="col-sm-4 mx-auto px-4 py-2 text-center rounded border bg-white" >
+          <div class="card mx-2 bg-light">
             <div class="card-header bg-primary text-light">
               Profile
             </div>
@@ -107,9 +107,10 @@
           Health history: <b>{{client.health_history}}</b></p>
           </div>
           
-          <div class="card m-2 px-2 bg-light">
+          <div class="card m-2 bg-light">
+            <div class="card-header bg-primary text-light">Booked Slots</div>
               <div class="card-body">
-                <h5 class="card-title">Booked Slots</h5>
+                
                 <script>
                   
                 </script>
@@ -136,7 +137,7 @@
             </div>
       </div>
 
-        <div class="col-sm-5 mx-auto p-3 border bg-white">
+        <div class="col-sm-5 mx-auto p-3 border bg-white rounded">
 
             <div class="card mb-2">
                 <div class="row  p-3">
