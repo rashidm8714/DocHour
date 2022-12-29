@@ -42,11 +42,11 @@
             <div class="modal-body">
               <form action="{% url 'client:upload_file' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="text" name="filename" placeholder="filename" class="form-control" required >
+                <input type="file" name="link" class="form-control" required>
                 <input type="date" name="date_of_issue" placeholder="Date of issue" class="form-control" required>
                 <div class="row">
                   <div class="col-9">
-                    <input type="file" name="link" class="form-control" required>
+                    <input type="text" name="filename" placeholder="Document name" class="form-control" required >
                   </div>
                   <div class="col-3">
                     <input type="submit" value="upload" class="form-control bg-info" required>

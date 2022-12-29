@@ -13,7 +13,7 @@ class Client(models.Model):
 
 class Uploads(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    link = models.FileField(upload_to='uploads/')
+    link = models.FileField(upload_to='media/uploads/')
     filename = models.CharField(max_length=150)
     caption = models.CharField(max_length=150)
     date_of_issue = models.DateField()
