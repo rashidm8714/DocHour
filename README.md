@@ -20,7 +20,7 @@
 
 7. cloning the project (downloading project to local machine)
 
-      `git clone https://github.com/musowir/DocHour.git` 
+      `https://github.com/rashidm8714/DocHour.git` 
 
 8. go to project directory
 
